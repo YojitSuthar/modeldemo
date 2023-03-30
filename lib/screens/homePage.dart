@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider_api/model/getall.dart';
+import 'package:provider_api/model/product.dart';
 import 'package:provider_api/service/getproduct.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -13,35 +13,42 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  List<GetAppProduct> ProductData=<GetAppProduct>[];
-  List<Product> Products=<Product>[];
-  Future getData1() async {
-    var product = <GetAppProduct>[];
+  List<Product> products= [];
+
+  Future<void> getData() async {
     var response = await http.get(Uri.parse(
         "https://dummyjson.com/products"));
     if (response.statusCode == 200) {
-      final  Map<String, dynamic> responseData  = jsonDecode(response.body.toString());
-      product.add(GetAppProduct.fromJson(responseData));
+      final body=jsonDecode(response.body) ;
+      final json= body['products'] as List<dynamic>;
+      final data= json.map((e) {
+        // final images= e['images']['first'];
+        return Product(e['title'], e['brand'],e['images']);
+      }).toList();
+      setState(() {
+        products = data;
+      });
+      // print(body['products']);
+
+    /*  final  Map<String, dynamic> responseData  = jsonDecode(response.body.toString());
+      productData.add(GetAppProduct.fromJson(responseData));
     }
-    
-    print()
-    return product;
+    products.addAll(productData[0].product as Iterable<Product>);
+    for(var index=0;index>products.length;index++) {
+      print(products[index].brand);
+   */ }
+    print(products.length.toString());
+   // return product;
   }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    change();
+    getData();
   }
 
-  void change(){
-    getData1().then((value) {
-     debugPrint(value.toString());
-     GetAppProduct.userModelFromJson(value);
-     //  ProductData.addAll(value as Iterable<GetAppProduct>);
-    });
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +58,12 @@ class _HomePageState extends State<HomePage> {
       body: Padding(
         padding: const EdgeInsets.all(8),
         child: ListView.builder(
-            itemCount: ProductData.length,
+            itemCount: products.length,
             itemBuilder: (BuildContext context, index) {
+              final product=products[index];
+              final title= product.title;
+              final brand= product.brand;
+              print(product.images);
               return Card(
                 child:
                 Column(
@@ -60,11 +71,11 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(5),
-                      child: Text("Name: ${ProductData[0].product?[index].title}")
+                      child: Text("Name: $title")
                     ),
                     Padding(
                       padding: const EdgeInsets.all(5),
-                      child: Text("Brand: ${ProductData[0].product?[index].brand}"),
+                      child: Text("Brand: $brand"),
                     ),
                   ],
                 ),
