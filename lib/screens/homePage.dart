@@ -15,8 +15,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  late Products data;
-  // List<Product> products= [];
+   Products data=Products();
 
 
   Future<void> getData() async {
@@ -24,10 +23,10 @@ class _HomePageState extends State<HomePage> {
         "https://dummyjson.com/products"));
     if (response.statusCode == 200) {
       final body = jsonDecode(response.body);
-      final json = body['products'] as List<dynamic>;
-      data= Products.fromJson(body);
-      print(data.product![29].title);
 
+    setState(() {
+          data= Products.fromJson(body);
+      });
     }
   }
 
@@ -42,18 +41,18 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // debugPrint(ProductData.length.toString());
+   //  debugPrint(data.product?.length.toString());
     return Scaffold(
       appBar: AppBar(title:const Text("All product")),
       body: Padding(
         padding: const EdgeInsets.all(8),
         child: ListView.builder(
-            itemCount: data.product!.length,
+            itemCount: data.product!.length?? 1,
             itemBuilder: (BuildContext context, index) {
-              // final product=products[index];
-              // final title= product.title;
-              // final brand= product.brand;
-            //  print(product.images);
+              final product=data.product![index];
+              final title= product.title;
+              final brand= product.brand;
+              print(product.images![0].toString());
               return Card(
                 child:
                 Column(
@@ -61,11 +60,11 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(5),
-                      child: Text("Name: ${data.product![index].title}")
+                      child: Text("Name: $title")
                     ),
                     Padding(
                       padding: const EdgeInsets.all(5),
-                      child: Text("Brand: ${data.product[index].brand}"),
+                      child: Text("Brand: $brand"),
                     ),
                   ],
                 ),
